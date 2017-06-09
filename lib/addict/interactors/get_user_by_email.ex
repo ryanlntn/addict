@@ -4,7 +4,21 @@ defmodule Addict.Interactors.GetUserByEmail do
   Returns `{:ok, user}` or `{:error, [authentication: "Incorrect e-mail/password"]}`
   """
   def call(email, schema \\ Addict.Configs.user_schema, repo \\ Addict.Configs.repo) do
-    repo.get_by(schema, email: email) |> process_response
+    ids = Addict.Configs.alternate_unique_identifiers
+
+    if ids && !Enum.empty?(ids) do
+      query = Enum.reduce(ids, schema, fn key, user ->
+        from u in user, or_where: field(u, ^key) == ^email
+      end)
+
+      query
+      |> repo.one
+      |> process_response
+    else
+      schema
+      |> repo.get_by(email: email)
+      |> process_response
+    end
   end
 
   defp process_response(nil) do

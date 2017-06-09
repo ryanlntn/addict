@@ -1,5 +1,8 @@
 defmodule Addict.Interactors.Login do
-  alias Addict.Interactors.{GetUserByEmail, VerifyPassword}
+  alias Addict.Interactors.{
+    GetUserByEmail,
+    VerifyPassword
+  }
 
   @doc """
   Verifies if the `password` is correct for the provided `email`
